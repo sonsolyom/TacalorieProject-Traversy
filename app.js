@@ -25,6 +25,26 @@ const ItemCtrl =(function(){
     getItems: function(){
       return data.items;
     },
+    addItem: function(name, calories){
+      let ID;
+      //create ID
+      if(data.items.length > 0){
+        ID = data.items[data.items.length - 1].id + 1;
+      } else {
+        ID = 0;
+      }
+
+      //Calories to number
+      calories = parseInt(calories);
+
+      //Create new otem
+      newItem = new Item(ID, name, calories);
+
+      //Add to items array
+      data.item.push(newItem);
+
+      return newItem;
+    },
     logData: function(){
       return data;
     }
@@ -39,6 +59,9 @@ const ItemCtrl =(function(){
 const UICtrl =(function(){
   const UISelectors = {
     itemList: '#item-list',
+    addBtn: '.add-btn',
+    itemNameInput: '#item-name',
+    itemCaloriesInput: '#item-calories',
   }
   
   //Public methods
@@ -60,12 +83,45 @@ const UICtrl =(function(){
       //Insert ist items
       document.querySelector(UISelectors.itemList).innerHTML = html;
     },
+
+    getItemInput: function(){
+      return {
+        name: document.querySelector(UICtrl.itemNameInput).value,
+        calories: document.querySelector(UICtrl.itemCaloriesInput).value
+      }
+    },
+
+    getSelectors: function(){
+      return UISelectors;
+    }
   }
 
 })();
 
 //App Controller
 const App = (function(ItemCtrl, UICtrl){
+  //Load event listeners
+  const loadEventListeners = function(){
+    //Get UI selectors
+    const UISelectors = UICtrl.getSelectors();
+
+    //Add item event
+    document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
+
+    //Add item submit
+    const itemAddSubmit = function(e){
+      //Get form input from UICtrl
+      const input = UICtrl.getItemInput();
+
+      //Check for name and calories input
+      if(input.name !== '' && input.calories !== ''){
+        //Add item
+        const newItem = ItemCtrl.addItem(input.name, input.calories);
+      }
+
+      e.preventDefault();
+    }
+  }
 
   /* console.log(ItemCtrl.logData()); */
 
@@ -80,7 +136,8 @@ const App = (function(ItemCtrl, UICtrl){
       //Populate list with item
       UICtrl.populateItemList(items);
 
-      
+      //Load event listeners
+      loadEventListeners();
     }
   }
 
